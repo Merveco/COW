@@ -1,8 +1,10 @@
 package com.anadolu.cow;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import com.memetix.mst.language.Language;
@@ -22,31 +24,29 @@ import android.widget.TextView;
 public class SentToTranslatorActivity extends Activity {
 	private static final String TAG = SentToTranslatorActivity.class.getSimpleName();
 	String translatedText;
+	StringBuilder text;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		/*
-		Translate.setClientId("4600b238-ee42-4ab5-bfd2-e33e0cafba32");
-        Translate.setClientSecret("HnI6hNj+xSq2yiG7jxArnhHq59Knu+uxQFp0LswCw/A=");
         
 		File sdcardPath = Environment.getExternalStorageDirectory();
-		File file = new File(sdcardPath, "original.txt");*/
+		File file = new File(sdcardPath, "original.txt");
 		/*
 		FileWriter fwriter;
 		try {
 			fwriter = new FileWriter(file);
 			BufferedWriter out = new BufferedWriter(fwriter);
-	        out.write("Hello world");
+	        out.write("Я люблю коров.");
 	        out.close();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
        */
-       /* file = new File(sdcardPath, "original.txt");
-		StringBuilder text = new StringBuilder();
-		TextView tv = (TextView)findViewById(R.id.showText);
+		
+		text = new StringBuilder();
+		final TextView tv = (TextView)findViewById(R.id.showText);
 		try {
 		    BufferedReader br = new BufferedReader(new FileReader(file));
 		    String line;
@@ -58,7 +58,8 @@ public class SentToTranslatorActivity extends Activity {
 		}
 		catch (IOException e) {
 			//
-		}	
+		}
+		tv.setText(text);
 		Button btnTrans = (Button)findViewById(R.id.buttonTranslate);
 		btnTrans.setClickable(true);
 		btnTrans.setOnClickListener(new OnClickListener() {
@@ -66,23 +67,15 @@ public class SentToTranslatorActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-	            Log.i("LOG", translatedText);
-	            try {
-	             translatedText = Translate.execute("I should probably set this to something a little less profane", Language.ENGLISH, Language.FRENCH);
-	            } catch(Exception e) {
-	             translatedText = e.toString();
-	            }
+				new MyAsyncTask() {
+		            protected void onPostExecute(Boolean result) {
+		            	tv.setText(translatedText);
+		            }
+		        }.execute();
 			}
 		});
 		
-		tv.setText(translatedText);
-		*/
-		final TextView tv = (TextView)findViewById(R.id.showText);
-        new MyAsyncTask() {
-            protected void onPostExecute(Boolean result) {
-             tv.setText(translatedText);
-            }
-        }.execute();
+        
 	}
 	
 	 class MyAsyncTask extends AsyncTask<Void, Integer, Boolean> {
@@ -91,9 +84,9 @@ public class SentToTranslatorActivity extends Activity {
 	        	Translate.setClientId("4600b238-ee42-4ab5-bfd2-e33e0cafba32");
 	            Translate.setClientSecret("HnI6hNj+xSq2yiG7jxArnhHq59Knu+uxQFp0LswCw/A=");
 	            try {
-	             translatedText = Translate.execute("I love cow", Language.ENGLISH, Language.TURKISH);
+	            	translatedText = Translate.execute(text.toString(), Language.AUTO_DETECT, Language.TURKISH);
 	            } catch(Exception e) {
-	             translatedText = e.toString();
+	            	translatedText = e.toString();
 	            }
 	            return true;
 	        }	
